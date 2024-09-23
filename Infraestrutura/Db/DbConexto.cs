@@ -11,6 +11,7 @@ public class DbContexto : DbContext
         _configuracaoAppSettings = configuracaoAppSettings;
     }
     public DbSet<Administrador> Administradores { get; set;} = default!;
+    public DbSet<Veiculo> Veiculos { get; set;} = default!;
 
     //criando um Seed para cadastrar o Administrador
     protected override void OnModelCreating(ModelBuilder modelBuilder)
