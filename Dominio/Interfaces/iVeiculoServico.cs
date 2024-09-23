@@ -6,7 +6,7 @@ namespace MinimalApi.Dominio.Interfaces;
 public interface IVeiculoServico
 {
     // O '?' informar que posso retornar NULL
-    List<Veiculo> Todos(int pagina = 1, string? nome = null, string? marca = null);
+    List<Veiculo> Todos(int? pagina = 1, string? nome = null, string? marca = null);
     Veiculo? BuscaPorId (int id);
     void Incluir (Veiculo veiculo);
     void Atualizar (Veiculo veiculo);
