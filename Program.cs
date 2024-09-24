@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MinimalApi.Dominio.Entidades;
 using MinimalApi.Dominio.Enuns;
 using MinimalApi.Dominio.Interfaces;
@@ -29,8 +30,8 @@ builder.Services.AddAuthentication(option => {
     option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(option => {
     option.TokenValidationParameters = new TokenValidationParameters{
-        //ValidateIssuer = true,
-        //ValidateAudience = jwtSettings.Audience,//true,
+        ValidateIssuer = false,
+        ValidateAudience = false,//true,
         ValidateLifetime = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
     };
@@ -43,7 +44,35 @@ builder.Services.AddScoped<IAdministradorServico, AdministradorServico>();
 builder.Services.AddScoped<IVeiculoServico, VeiculoServico>();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+//configurando swagger para a passagem de token JWT
+builder.Services.AddSwaggerGen(options => {
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme{
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Insira o Token JWT aqui."
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {   
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference 
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+
+});
+
 
 
 builder.Services.AddDbContext<DbContexto>(options => {
@@ -58,7 +87,7 @@ var app = builder.Build();
 #endregion
 
 #region Home
-app.MapGet("/", () => Results.Json(new Home())).WithTags("Home");
+app.MapGet("/", () => Results.Json(new Home())).AllowAnonymous().WithTags("Home");
 
 #endregion
 
@@ -101,7 +130,7 @@ app.MapPost("/administradores/login", ([FromBody] LoginDTO loginDTO, IAdministra
         });
     }
     else { return Results.Unauthorized(); }
-}).WithTags("Administradores");
+}).AllowAnonymous().WithTags("Administradores"); //.AllowAnonymous() -> Significa que nao tem restricao de autenticação
 
 
 app.MapGet("/administradores", ([FromQuery] int? pagina, IAdministradorServico administradorServico) => {
