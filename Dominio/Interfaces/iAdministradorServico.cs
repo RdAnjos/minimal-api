@@ -7,4 +7,7 @@ public interface IAdministradorServico
 {
     // O '?' informar que posso retornar NULL
     Administrador? Login(LoginDTO loginDTO);
+    Administrador Incluir(Administrador administrador);
+    Administrador? BuscaPorId(int id);
+    List<Administrador> Todos(int? pagina);
 }
