@@ -91,6 +91,15 @@ public class Startup
             );
         });
 
+        services.AddCors( options => {
+            options.AddDefaultPolicy(
+                builder =>{
+                    builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+                });
+        });
+
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -104,6 +113,8 @@ public class Startup
         //Sempre seguir essa ordem abaixo
         app.UseAuthentication();
         app.UseAuthorization();
+
+        app.UseCors();
 
         app.UseEndpoints(endpoints => {
 
